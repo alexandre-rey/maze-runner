@@ -36,7 +36,7 @@ export class Maze {
         console.log('Time to generate BFS solution: ', endTime - startTime, 'ms');
 
         path.forEach(cell => {
-            this.cells[cell.x][cell.y].isPath = true;
+            this.cells[cell.x][cell.y].isBfs = true;
         });
     }
 
@@ -50,8 +50,13 @@ export class Maze {
         this.height = cells[0].length;
     }
 
-    public setCellPath(x: number, y: number) {
-        this.cells[x][y].isPath = true;
+    public setCellPath(x: number, y: number, type: string) {
+        if(type === 'bfs'){
+            this.cells[x][y].isBfs = true;
+        } else if(type === 'astar'){
+            this.cells[x][y].isAStar = true;
+        }
+        
     }
 
     public generate() {
@@ -159,7 +164,7 @@ export class Maze {
     }
 
 
-    private findNeighbour(cell: Cell, used: boolean): Cell[] {
+    public findNeighbour(cell: Cell, used: boolean): Cell[] {
 
         const neighbour: Cell[] = [];
 

@@ -42,7 +42,7 @@ export function bfs(start: Cell, end: Cell, maze: Cell[][]): Cell[] {
 }
 
 
-function isReachable(cell1: Cell, cell2: Cell): boolean {
+export function isReachable(cell1: Cell, cell2: Cell): boolean {
 
     if (cell1.y === cell2.y) {
 

@@ -1,5 +1,4 @@
 
-
 export class Cell {
 
     public topWall: boolean = true;
@@ -7,9 +6,24 @@ export class Cell {
     public bottomWall: boolean = true;
     public leftWall: boolean = true;
     public isUsed: boolean = false;
-    public isPath: boolean = false;
+
+    public isAStar: boolean = false;
+    public isBfs: boolean = false;
+
+    public cost: number = 0;
+    public heuristic: number = 0;
+    public parent?: Cell;
+    
 
     constructor(public type: string, public x: number, public y: number) { }
+
+    public getTotalCost(): number {
+        return this.cost + this.heuristic;
+    }
+
+    public getKey(){
+        return `${this.x},${this.y}`;
+    }
 
     public getClass() {
 
@@ -19,9 +33,14 @@ export class Cell {
             className += ' start';
         } else if (this.type === 'end') {
             className += ' end';
-        } else if (this.isPath) {
-            className += ' path';
-        }
+        } else {
+            if(this.isBfs){
+                className += ' bfs'
+            }
+            if(this.isAStar){
+                className += ' astar'
+            }
+        } 
 
         if (this.topWall) {
             className += ' topWall';
