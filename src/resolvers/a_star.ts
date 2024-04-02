@@ -1,6 +1,6 @@
 import { isReachable } from "./bfs";
-import { Cell } from "./entities/cell";
-import { Maze } from "./entities/maze";
+import { Cell } from "../entities/cell";
+import { Maze } from "../entities/maze";
 
 
 export function aStar(start: Cell, end: Cell, maze: Maze): Cell[] {

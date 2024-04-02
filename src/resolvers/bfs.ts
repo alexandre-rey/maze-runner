@@ -1,4 +1,4 @@
-import { Cell } from "./entities/cell";
+import { Cell } from "../entities/cell";
 
 // Breadth First Search
 export function bfs(start: Cell, end: Cell, maze: Cell[][]): Cell[] {

@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { Maze } from "./entities/maze"
-import { bfs } from "./bfs";
-import { aStar } from "./a_star";
+import { bfs } from "./resolvers/bfs";
+import { aStar } from "./resolvers/a_star";
 
 function App() {
 
-  const mazeSize = 200;
+  const mazeSize = 50;
   const [time, setTime] = useState<number>(0);
   const [maze, setMaze] = useState<Maze | null>(null);
 
