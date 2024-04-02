@@ -1,3 +1,4 @@
+import { Edge } from "./edge";
 
 export class Cell {
 
@@ -13,15 +14,28 @@ export class Cell {
     public cost: number = 0;
     public heuristic: number = 0;
     public parent?: Cell;
-    
+
+    public edges: Edge[] = [];
 
     constructor(public type: string, public x: number, public y: number) { }
+
+
+    public getIntactWallsCount(): number {
+        let intactWalls = 4;
+
+        if(!this.topWall) intactWalls--;
+        if(!this.rightWall) intactWalls--;
+        if(!this.bottomWall) intactWalls--;
+        if(!this.leftWall) intactWalls--;
+
+        return intactWalls;
+    }
 
     public getTotalCost(): number {
         return this.cost + this.heuristic;
     }
 
-    public getKey(){
+    public getKey() {
         return `${this.x},${this.y}`;
     }
 
@@ -34,13 +48,13 @@ export class Cell {
         } else if (this.type === 'end') {
             className += ' end';
         } else {
-            if(this.isBfs){
+            if (this.isBfs) {
                 className += ' bfs'
             }
-            if(this.isAStar){
+            if (this.isAStar) {
                 className += ' astar'
             }
-        } 
+        }
 
         if (this.topWall) {
             className += ' topWall';

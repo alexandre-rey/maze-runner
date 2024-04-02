@@ -92,6 +92,7 @@ h1 {
 
 .bfs::before {
   left: 0;
+  width: 100%;
   background-color: #FFCCCB;
 }
 

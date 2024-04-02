@@ -1,10 +1,13 @@
-import { bfs } from "../bfs";
+import { BinaryHeap } from "../utils/binaryHeap";
 import { Cell } from "./cell";
+import { Edge } from "./edge";
 
 
 export class Maze {
 
     private cells: Cell[][] = [];
+    private edges: Edge[] = [];
+    private edgeIndex = new Set<string>();
     private usedCells: Cell[] = [];
 
     constructor(private width: number, private height: number) {
@@ -16,8 +19,10 @@ export class Maze {
             }
         }
 
-        const randomX = Math.floor(Math.random() * width / 2);
-        const randomY = Math.floor(Math.random() * height / 2);
+        this.generateEdges();
+
+        const randomX = 0;//Math.floor(Math.random() * width / 2);
+        const randomY = 0;//Math.floor(Math.random() * height / 2);
 
         this.cells[randomX][randomY].type = 'start';
         this.cells[randomX][randomY].isUsed = true;
@@ -28,16 +33,33 @@ export class Maze {
         const randomEndY = height - 1
 
         this.cells[randomEndX][randomEndY].type = 'end';
+    }
 
-        const startTime = new Date().getTime();
-        const path = bfs(this.getStart(), this.getEnd(), this.cells);
-        const endTime = new Date().getTime();
+    private generateEdges() {
 
-        console.log('Time to generate BFS solution: ', endTime - startTime, 'ms');
+        const tmpCells = this.cells.flat();
 
-        path.forEach(cell => {
-            this.cells[cell.x][cell.y].isBfs = true;
+        tmpCells.forEach(cell => {
+
+            const neighbours = this.findNeighbour(cell, false);
+
+            neighbours.forEach(neighbour => {
+
+                if (
+                    !this.edgeIndex.has(`${neighbour.getKey()}:${cell.getKey()}`)
+                    && !this.edgeIndex.has(`${cell.getKey()}:${neighbour.getKey()}`)
+                ) {
+                    const randomWeight = Math.random() //Math.floor(Math.random() * this.width * this.height);
+                    const edge = new Edge(cell, neighbour, randomWeight);
+                    this.edges.push(edge);
+                    cell.edges.push(edge);
+                    neighbour.edges.push(edge);
+                    this.edgeIndex.add(`${neighbour.getKey()}:${cell.getKey()}`);
+                }
+            });
         });
+
+        this.edgeIndex.clear();
     }
 
     public getCells() {
@@ -51,17 +73,30 @@ export class Maze {
     }
 
     public setCellPath(x: number, y: number, type: string) {
-        if(type === 'bfs'){
+        if (type === 'bfs') {
             this.cells[x][y].isBfs = true;
-        } else if(type === 'astar'){
+        } else if (type === 'astar') {
             this.cells[x][y].isAStar = true;
         }
-        
+
     }
 
     public generate() {
-        while (this.hasUnusedCell()) {
-            this.generateMaze();
+
+        const start = this.getStart();
+        const binaryHeap = new BinaryHeap<Edge>((a, b) => a.weight - b.weight);
+
+        start.edges.forEach(edge => binaryHeap.insert(edge));
+
+        while (!binaryHeap.isEmpty()) {
+
+            const minEdge = binaryHeap.extractMin();
+
+            if (minEdge !== undefined && !minEdge.cell2.isUsed) {
+                minEdge.cell2.isUsed = true;
+                this.suppressWall(minEdge.cell1, minEdge.cell2);
+                minEdge.cell2.edges.forEach(edge => binaryHeap.insert(edge));
+            }
         }
     }
 
@@ -87,45 +122,6 @@ export class Maze {
         }
 
         return this.cells[0][0];
-    }
-
-
-    private generateMaze() {
-
-        let candidateCells: Cell[] = [];
-
-        this.usedCells.forEach(usedCell => {
-            candidateCells = this.addCellsWithoutDuplicates(candidateCells, this.findNeighbour(usedCell, false));
-        });
-
-        const randomCandidate = candidateCells[Math.floor(Math.random() * candidateCells.length)];
-        const candidateNeighbours = this.findNeighbour(randomCandidate, true);
-        let candidateNeighbour: Cell | null = null;
-
-        if (candidateNeighbours.length === 1) {
-            candidateNeighbour = candidateNeighbours[0];
-        } else {
-            candidateNeighbour = candidateNeighbours[Math.floor(Math.random() * candidateNeighbours.length)];
-        }
-
-        this.cells[candidateNeighbour.x][candidateNeighbour.y].isUsed = true;
-        this.usedCells.push(this.cells[randomCandidate.x][randomCandidate.y]);
-
-        this.suppressWall(randomCandidate, candidateNeighbour);
-
-
-    }
-
-    private addCellsWithoutDuplicates(target: Cell[], newCells: Cell[]): Cell[] {
-
-        const result = target;
-        newCells.forEach(cell => {
-            if (!result.includes(cell)) {
-                result.push(cell);
-            }
-        });
-
-        return result;
     }
 
     private suppressWall(cell1: Cell, cell2: Cell) {
@@ -154,13 +150,6 @@ export class Maze {
 
         this.cells[cell1.x][cell1.y].isUsed = true;
         this.cells[cell2.x][cell2.y].isUsed = true;
-    }
-
-    private hasUnusedCell() {
-        const totalCells = this.width * this.height;
-        const usedCells = this.usedCells.length;
-
-        return totalCells !== usedCells;
     }
 
 
@@ -221,7 +210,6 @@ export class Maze {
                 }
             }
         }
-
 
         return neighbour;
 

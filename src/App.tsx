@@ -5,7 +5,7 @@ import { aStar } from "./a_star";
 
 function App() {
 
-  const mazeSize = 20;
+  const mazeSize = 200;
   const [time, setTime] = useState<number>(0);
   const [maze, setMaze] = useState<Maze | null>(null);
 

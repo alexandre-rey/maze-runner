@@ -17,8 +17,6 @@ export function aStar(start: Cell, end: Cell, maze: Maze): Cell[] {
 
         currentCell = findMinimunCost(openSet);
 
-        if (currentCell.type === 'end') break;
-
         openSet.splice(openSet.indexOf(currentCell));
         closedSet.push(currentCell);
 
@@ -47,12 +45,20 @@ export function aStar(start: Cell, end: Cell, maze: Maze): Cell[] {
         });
     }
 
+    console.log(closedSet);
+    
+
     let tmpPathCell = end;
 
     while (tmpPathCell.type !== 'start') {
         path.push(tmpPathCell);
-        if (tmpPathCell.parent) {
+        console.log('parent', tmpPathCell.parent);
+        
+        if (tmpPathCell.parent !== undefined) {
+
             tmpPathCell = tmpPathCell.parent;
+        } else {
+            break;
         }
     }
 
